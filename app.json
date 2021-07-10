@@ -1,0 +1,12 @@
+{
+  "name": "toDoAPp",
+  "displayName": "toDoAPp",
+  "expo": {
+    "name": "toDoAPp",
+    "slug": "toDoAPp",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
