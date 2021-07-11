@@ -7,8 +7,6 @@ import Modal from "react-native-modal";
 import { ModalContainer, HeaderModal, MessageContainerModal } from "./styled";
 import { TextComponent } from "../../style/globalStyle";
 import { IconAnt } from "../../screens/task/Styled";
-import { ButtonTouchable } from "../../screens/task/Styled";
-import { TouchableOpacity } from "react-native";
 
 const AlertModal = ({
   visible = false,

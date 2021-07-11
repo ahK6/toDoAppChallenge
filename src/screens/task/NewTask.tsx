@@ -1,11 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { Text, TouchableOpacity, View, StyleSheet, Button } from "react-native";
+import React, { useEffect, useState, useContext } from "react";
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  Button,
+  ActivityIndicator,
+  BackHandler,
+} from "react-native";
+import moment from "moment";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import { Picker } from "@react-native-picker/picker";
+import { useDispatch, useSelector } from "react-redux";
 import { Container, TextComponent } from "../../style/globalStyle";
 import {
-  FormContainer,
   TextInput,
   InputsContainer,
-  PickerInput,
   DropDownDateContainer,
   DropDownHourContainer,
   IconLine,
@@ -14,15 +27,9 @@ import {
   ButtonTouchable,
   ButtonContainer,
 } from "./Styled";
-import moment from "moment";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { HVisibleContext } from "../../context/VisibleHeader";
+import { FormContainer } from "../../style/globalStyle";
 import DateTimePicker from "../../components/Pickers/DateTimePicker";
-
-import { Picker } from "@react-native-picker/picker";
-import { useDispatch, useSelector } from "react-redux";
 import { addTask } from "../../store/actions/TaskActions";
 import AlertModal from "../../components/Modals/AlertModal";
 
@@ -40,7 +47,6 @@ export interface TaskInfo {
 
 const NewTask: React.FC = () => {
   const dispatch = useDispatch();
-  const taskInfoSelector = useSelector((store) => store.Tasks);
 
   const randomId = () => {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -53,6 +59,8 @@ const NewTask: React.FC = () => {
     return color;
   };
 
+  const [headerVisible, setHeaderVisible] = useContext(HVisibleContext);
+
   const [taskInfo, setTaskInfo] = useState<TaskInfo>({
     id: randomId(),
     title: null,
@@ -64,6 +72,9 @@ const NewTask: React.FC = () => {
     completed: false,
     color: randomColor(),
   });
+
+  const [savingNewTask, setSavingNewTask] = useState(false);
+
   const [pickerDateTimeProps, setPickerDateTimeProps] = useState<any>({
     visible: false,
     mode: "",
@@ -74,7 +85,6 @@ const NewTask: React.FC = () => {
     visible: false,
     type: "",
   });
-  console.log(taskInfoSelector);
 
   const onPickerDateTimeChange = (event: Event, selectedDateOrTime: Date) => {
     setPickerDateTimeProps({
@@ -97,13 +107,71 @@ const NewTask: React.FC = () => {
     setTaskInfo({ ...taskInfo, title: value });
   };
 
-  useEffect(() => {
-    console.log("DEAD LINEEE: " + taskInfo.deadLine);
-  }, [taskInfo.deadLine]);
+  const handlePressNewTask = async () => {
+    if (savingNewTask) {
+      return 0;
+    }
+    await setSavingNewTask(true);
+
+    if (
+      typeof taskInfo?.title === "string" &&
+      taskInfo?.title !== "" &&
+      taskInfo.deadLine?.getUTCDay &&
+      taskInfo?.deadLine !== null &&
+      taskInfo?.startTime?.getUTCDay &&
+      taskInfo?.startTime !== null &&
+      taskInfo?.endTime?.getUTCDay &&
+      taskInfo?.endTime !== null &&
+      typeof taskInfo?.remind === "string" &&
+      taskInfo?.remind !== "" &&
+      typeof taskInfo?.repeat === "string" &&
+      taskInfo?.repeat !== ""
+    ) {
+      dispatch(addTask(taskInfo)).catch(function (error) {
+        return setShowModalAlert({
+          visible: true,
+          type: "error",
+        });
+      });
+      setShowModalAlert({
+        visible: true,
+        type: "success",
+      });
+
+      setTaskInfo({
+        id: randomId(),
+        title: null,
+        deadLine: new Date(),
+        startTime: null,
+        endTime: null,
+        remind: "5 minutes early",
+        repeat: "Daily",
+        completed: false,
+        color: randomColor(),
+      });
+    } else {
+      setShowModalAlert({
+        visible: true,
+        type: "other",
+      });
+    }
+    setTimeout(function () {
+      setSavingNewTask(false);
+    }, 1000);
+  };
 
   useEffect(() => {
-    console.log("Dstartr " + taskInfo.startTime);
-  }, [taskInfo.startTime]);
+    const backAction = () => {
+      setHeaderVisible("main");
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   return (
     <Container>
@@ -114,7 +182,7 @@ const NewTask: React.FC = () => {
           setShowModalAlert({ ...showModalAlert, visible: false });
         }}
       />
-      <FormContainer>
+      <FormContainer paddingTop={`${hp(2)}px`}>
         <InputsContainer>
           <TextComponent marginBottom={`${hp(1)}px`} fontWeight="bold">
             Title
@@ -255,56 +323,13 @@ const NewTask: React.FC = () => {
       </FormContainer>
 
       <ButtonContainer>
-        <ButtonTouchable
-          activeOpacity={0.7}
-          onPress={() => {
-            console.log(taskInfo);
-            if (
-              typeof taskInfo?.title === "string" &&
-              taskInfo?.title !== "" &&
-              taskInfo.deadLine?.getUTCDay &&
-              taskInfo?.deadLine !== null &&
-              taskInfo?.startTime?.getUTCDay &&
-              taskInfo?.startTime !== null &&
-              taskInfo?.endTime?.getUTCDay &&
-              taskInfo?.endTime !== null &&
-              typeof taskInfo?.remind === "string" &&
-              taskInfo?.remind !== "" &&
-              typeof taskInfo?.repeat === "string" &&
-              taskInfo?.repeat !== ""
-            ) {
-              dispatch(addTask(taskInfo)).catch(function (error) {
-                return setShowModalAlert({
-                  visible: true,
-                  type: "error",
-                });
-              });
-              setShowModalAlert({
-                visible: true,
-                type: "success",
-              });
-
-              setTaskInfo({
-                id: randomId(),
-                title: null,
-                deadLine: new Date(),
-                startTime: null,
-                endTime: null,
-                remind: "5 minutes early",
-                repeat: "Daily",
-                completed: false,
-                color: randomColor(),
-              });
-            } else {
-              setShowModalAlert({
-                visible: true,
-                type: "other",
-              });
-            }
-          }}
-        >
+        <ButtonTouchable activeOpacity={0.7} onPress={handlePressNewTask}>
           <TextComponent fontWeight="bold" color="white">
-            Create a Task
+            {savingNewTask ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              "Create a Task"
+            )}
           </TextComponent>
         </ButtonTouchable>
       </ButtonContainer>

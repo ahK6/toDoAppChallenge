@@ -1,10 +1,4 @@
-import {
-  TADDTASK_ATTEMP,
-  ADDTASK_SUCCESS,
-  ADDTASK_UPDATE,
-  ADDTASK_FAILURE,
-  ADDTASK_ATTEMP,
-} from "./../types";
+import { ADDTASK_SUCCESS, ADDTASK_UPDATE } from "./../types";
 
 export const addTask = (taskInfo) => {
   return async (dispatch) => {

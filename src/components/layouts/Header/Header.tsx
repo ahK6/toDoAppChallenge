@@ -1,4 +1,5 @@
 import React, { useContext, createRef } from "react";
+import { TouchableOpacity } from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -11,14 +12,13 @@ import {
   IconIon,
 } from "./Styled";
 import { HVisibleContext } from "../../../context/VisibleHeader";
-import { TouchableOpacity } from "react-native";
 import { goBack } from "../../../navigation/RootNavigation";
 
 const Header: React.FC = () => {
   const [headerVisible, setHeaderVisible] = useContext(HVisibleContext);
 
   return (
-    <HeaderContainer>
+    <HeaderContainer borderBottomWidth="0.7px">
       {headerVisible == "main" ? (
         <>
           <HeaderText>Board</HeaderText>

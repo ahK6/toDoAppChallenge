@@ -3,9 +3,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { withProps } from "../../helpers/withPropsStyle";
 
-var defaultRight: String = `${wp(5)}px;`;
-var fontSizeDefault: String = `${wp(4)}px`;
+interface IStyled {
+  headerColor: String;
+}
 
 export const ModalContainer = styled.View`
   background-color: white;
@@ -16,7 +18,7 @@ export const ModalContainer = styled.View`
   overflow: hidden;
 `;
 
-export const HeaderModal = styled.View`
+export const HeaderModal = withProps<IStyled>()(styled.View)`
   background-color: ${(props) =>
     props.headerColor ? props.headerColor : "red"};
   width: ${wp(100)}px;

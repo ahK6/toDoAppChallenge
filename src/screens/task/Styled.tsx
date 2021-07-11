@@ -5,14 +5,15 @@ import {
 } from "react-native-responsive-screen";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { SimpleLineIcons, AntDesign } from "@expo/vector-icons";
+import { withProps } from "../../helpers/withPropsStyle";
+
+interface IStyled {
+  fontSize: String;
+  right: String;
+}
 
 var defaultRight: String = `${wp(5)}px;`;
 var fontSizeDefault: String = `${wp(4)}px`;
-
-export const FormContainer = styled.ScrollView`
-  height: ${hp(100)}px;
-  padding: 0 ${wp(6)}px 0 ${wp(6)}px;
-`;
 
 export const InputsContainer = styled.View`
   display: flex;
@@ -47,7 +48,7 @@ export const DropDownDateContainer = styled.View`
   color: #c5c5c5;
 `;
 
-export const IconAnt = styled(AntDesign)`
+export const IconAnt = withProps<IStyled>()(styled(AntDesign))`
   font-size: ${(props) => (props.fontSize ? props.fontSize : fontSizeDefault)};
   color: ${(props) => (props.color ? props.color : "#adadad")};
   position: absolute;
