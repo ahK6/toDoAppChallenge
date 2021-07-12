@@ -1,4 +1,4 @@
-Go to the app route and run "expo start"
+Go to the app route, run "npm install" and then "expo start"
 
 Used libraries:
 - @expo/vector-icons
